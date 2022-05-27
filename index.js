@@ -12,7 +12,7 @@ var waktu = ["Subuh", "Zohor", "Asar", "Magrib", "Isyak",];
 var date = new Date();
 var filename = date.getFullYear() + '-data.json'
 var prayerscheduler = [];
-
+var token,chat_id;
 /**
  * Get prayer time data from esolat **website
  */
@@ -52,7 +52,7 @@ var imglinks = [
 var notificationImgCallback = async (url, imgcaption = "", chat_id = "-725570817") => {
 
     res = await axios.get(
-        `https://api.telegram.org/bot1060772370:AAGAzhBft9fIWnDOzWbQ0CGphRq0jQ3AE_U/sendPhoto?parse_mode=HTML&chat_id=${chat_id}&photo=${encodeURI(url)}&caption=${imgcaption}`
+        `https://api.telegram.org/bot${token}/sendPhoto?parse_mode=HTML&chat_id=${chat_id}&photo=${encodeURI(url)}&caption=${imgcaption}`
     )
 
     console.debug(`send notification image ${JSON.stringify(res.data)}`)
@@ -121,7 +121,9 @@ var updateprayertime = async () => {
     // }
     // return;
 
-
+    var secret = JSON.parse(fs.readFileSync("secret.json"));
+    token = secret.token;
+    chat_id = secret.chat_id;
 
     console.debug(`current date ${date.toDateString()}`);
 
