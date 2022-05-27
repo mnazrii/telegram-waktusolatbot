@@ -31,7 +31,7 @@ var getprayertimes = async () => {
 var notificationCallback = async (text = "negaraku", chat_id = "-725570817") => {
 
     res = await axios.get(
-        `https://api.telegram.org/bot1060772370:AAGAzhBft9fIWnDOzWbQ0CGphRq0jQ3AE_U/sendMessage?parse_mode=HTML&chat_id=${chat_id}&text=${text}`
+        `https://api.telegram.org/bot${token}/sendMessage?parse_mode=HTML&chat_id=${chat_id}&text=${text}`
     );
     console.debug(`send notification ${JSON.stringify(res.data)}`)
 }
