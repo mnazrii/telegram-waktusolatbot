@@ -15,6 +15,6 @@ untuk dapatkan token id. pergi ke @botfarther dalam telegram. dan tekan /newbot.
 add bot yg dah dibuat dalam group untuk membolehkan mesej dihantar. 
 
         Run:
-        `cd telegram-waktusolatbot
-        `npm install
-        `node index.js
+        cd telegram-waktusolatbot
+        npm install
+        node index.js
