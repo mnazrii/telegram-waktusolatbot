@@ -1,5 +1,6 @@
 {
   "name": "tele-prayertime",
+  
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "axios": "^0.27.2",
-    "node-schedule": "^2.1.0"
+    "node-schedule": "^2.1.0",
+    "telegraf": "^4.8.5"
   }
 }
