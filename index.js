@@ -35,7 +35,15 @@ const main = async () => {
 
 
     // var praydata1 = await readprayertime(date)
-    // var prayertimetoday = [praydata1.fajr, praydata1.dhuhr, praydata1.asr, praydata1.maghrib, praydata1.isha];
+    // let prayertimetoday = [praydata1.fajr.replace(":00",''), praydata1.dhuhr.replace(":00",''), praydata1.asr.replace(":00",''), praydata1.maghrib.replace(":00",''), praydata1.isha.replace(":00",'')];
+    // bot.telegram.sendMessage(CHAT_ID,`
+    //             Waktu solat bagi kawasan Kuala Lumpur:
+    //             Subuh\t\t${prayertimetoday[0]}
+    //             Zohor\t\t${prayertimetoday[1]}
+    //             Asar\t\t${prayertimetoday[2]}
+    //             Magrib\t\t${prayertimetoday[3]}
+    //             Isyak\t\t${prayertimetoday[4]}
+    //             `.replaceAll(`    `,''),{parse_mode: 'HTML'})
     // var praydatatime = prayertimetoday.map((x) => x.split(':'));
     // // console.log (praydatatime.fajr);
     //         //10 mins before reminder subuh [0],magrib [3],isyak [4]
@@ -70,7 +78,8 @@ const main = async () => {
     await updateprayertime();
 
     //run scheduler to set new prayer time  every one day
-    updateprayert = schedule.scheduleJob(`0 0 * * *`, async () => {
+    let uptprayerstr = "0 0 * * *";
+    updateprayert = schedule.scheduleJob(uptprayerstr, async () => {
         console.debug(`trigger set new prayer time scheduler`);
 
         date = new Date();
@@ -79,9 +88,9 @@ const main = async () => {
         if (!fs.existsSync(filename))
             getprayertimes()
 
-        await updateprayertime();
+        await updateprayertime(true);
     })
-    console.debug(`set updateprayert scheduler 0 0 * * *`);
+    console.debug(`set updateprayert ${uptprayerstr}`);
 
 }
 
@@ -126,27 +135,64 @@ const main = async () => {
     return daysIntoYear;
 }
 
+const timestrToAMPM = (timeString) => {
+    let H = +timeString.substr(0, 2);
+    let h = H % 12 || 12;
+    let ampm = (H < 12 || H === 24) ? "AM" : "PM";
+    timeString = h + timeString.substr(2, 3) + ampm;
+    return timeString;
+}
+
 /**
  * Update prayer time scheduler. Send notification on scheduled time
  * 5 times a day
  */
- const updateprayertime = async () => {
+ const updateprayertime = async (isupdate) => {
 
-        var praydata1 = await readprayertime(date)
-        var prayertimetoday = [praydata1.fajr, praydata1.dhuhr, praydata1.asr, praydata1.maghrib, praydata1.isha];
+        //read latest table
+        var praydata1 = await readprayertime(date)  
+        
+        //disable other prayer time alert
+        var prayertimetoday = [praydata1.fajr , praydata1.dhuhr, praydata1.asr, praydata1.maghrib, praydata1.isha];
+        
+        
+        //split to hh mm array
         var praydatatime = prayertimetoday.map((x) => x.split(':'));
-
+        
+        //split to am/pm time
+        var praydatatimeAMPM = prayertimetoday.map((x)=>timestrToAMPM(x));
+        
         //schedule prayer time notification
         for (let index = 0; index < prayertimetoday.length; index++) {
             
+            //text message to send
+            let chatstr =  text1.replace("{0}", waktu[index]).replace("{1}", praydatatimeAMPM[index]);
+
+            //cancel exisiting job
+            if(isupdate)
+                prayerscheduler[index].cancel();
+
             let schstr = `${praydatatime[index][1]} ${praydatatime[index][0]} * * *`
             prayerscheduler[index] = schedule.scheduleJob(schstr, () => //{}
-                bot.telegram.sendMessage(CHAT_ID,text1.replace("{0}", waktu[index]).replace("{1}", prayertimetoday[index]),{parse_mode: 'HTML'})
+                bot.telegram.sendMessage(CHAT_ID,chatstr,{parse_mode: 'HTML'})
             )
-            console.debug(`set scheduler ${waktu[index]} - ${schstr}`);
+            console.debug(`set scheduler ${waktu[index]} - ${schstr} ${chatstr} `);
 
         }
         
+
+        // //daily reminder
+        // prayerschedulerx = schedule.scheduleJob('37 17 * *', () => //{}
+        //         bot.telegram.sendMessage(CHAT_ID,`
+        //         Waktu solat bagi kawasan Kuala Lumpur:
+        //         Subuh  ${praydatatimeAMPM[0]}
+        //         Zohor  ${praydatatimeAMPM[1]}
+        //         Asar   ${praydatatimeAMPM[2]}
+        //         Magrib ${praydatatimeAMPM[3]}
+        //         Isyak  ${praydatatimeAMPM[4]}
+        //         `,{parse_mode: 'HTML'})
+        //     )
+
 
         //schedule 10 mins before reminder
         let i = 0;
@@ -157,6 +203,10 @@ const main = async () => {
         }
 
         Object.keys(alerptime).forEach((key) => {
+
+            if(isupdate)
+                alertcheduler[i].cancel();
+
 
             //convert to mins, -10 mins
             let timetmp = Number(alerptime[key][0])*60+Number(alerptime[key][1]) - 10;
@@ -171,13 +221,15 @@ const main = async () => {
             //set task scheduler
             let schstr2 = `${timetmparr[1]} ${timetmparr[0]} * * *`;
             
-            let msgstr = `Waktu solat <b>Fardu ${key} </b>akan masuk dalam masa 10 minit. Jom solat berjemaah di surau kita!`;
+            let msgstr = `Waktu solat <b>Fardu ${key} </b>akan masuk dalam masa 10 minit pada ${timestrToAMPM(alerptime[key].join(':'))}. Jom solat berjemaah di surau kita!`;
             console.debug(msgstr)
 
-            alertcheduler[++i] = schedule.scheduleJob(schstr2, () =>  //{}
+            alertcheduler[i] = schedule.scheduleJob(schstr2, () =>  //{}
                 bot.telegram.sendMessage(CHAT_ID, msgstr, {parse_mode: 'HTML'})
             )
             console.debug(`set reminder scheduler - ${schstr2} ${alerptime[key].join(":")}  ${timetmparr.join(":")} `);
+            
+            i++;
         })
 
 
