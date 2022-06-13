@@ -24,51 +24,6 @@ const main = async () => {
     console.debug(`current date ${date.toDateString()}`);
 
 
-//     await bot.telegram.sendMessage(CHAT_ID,`
-//     Saya akan send reminder <b>10 minit sebelum solat Magrib, Isyak dan Subuh</b> setiap hari.
-//     Sesiapa yang perasan dan tengah free tu moh la kita turun ya.. 
-//     InsyaAllah hati akan lebih tenang.
-
-//     <b>Terima kasih</b>
-// `.replaceAll(`    `,''),{parse_mode: 'HTML'})
-
-
-
-    // var praydata1 = await readprayertime(date)
-    // let prayertimetoday = [praydata1.fajr.replace(":00",''), praydata1.dhuhr.replace(":00",''), praydata1.asr.replace(":00",''), praydata1.maghrib.replace(":00",''), praydata1.isha.replace(":00",'')];
-    // bot.telegram.sendMessage(CHAT_ID,`
-    //             Waktu solat bagi kawasan Kuala Lumpur:
-    //             Subuh\t\t${prayertimetoday[0]}
-    //             Zohor\t\t${prayertimetoday[1]}
-    //             Asar\t\t${prayertimetoday[2]}
-    //             Magrib\t\t${prayertimetoday[3]}
-    //             Isyak\t\t${prayertimetoday[4]}
-    //             `.replaceAll(`    `,''),{parse_mode: 'HTML'})
-    // var praydatatime = prayertimetoday.map((x) => x.split(':'));
-    // // console.log (praydatatime.fajr);
-    //         //10 mins before reminder subuh [0],magrib [3],isyak [4]
-    //         [praydatatime[0], praydatatime[3], praydatatime[4]].forEach(pdreminder => {
-    //             let timetmp = Number(pdreminder[0])*60+Number(pdreminder[1]) - 10;
-                
-    //             //if 0000 hours
-    //             if(timetmp<0)
-    //                 timetmp = timetmp+1440;
-                
-    //             let timetmparr = [parseInt(timetmp / 60), timetmp % 60]; 
-    //             // let schstr = `${pdreminder[1]} ${pdreminder[0]} * * *`;
-    //             let schstr2 = `${timetmparr[1]} ${timetmparr[0]} * * *`;
-                
-    //             console.log (schstr2);
-    //         });
-
-    // for (let index = 0; index < prayertimetoday.length; index++) {
-    //     abc = await bot.telegram.sendMessage(CHAT_ID,text1.replace("{0}", waktu[index]).replace("{1}", prayertimetoday[index]),{parse_mode: 'HTML'})
-    //     console.debug(`set scheduler ${waktu[index]} -  ${praydatatime[index][1]} ${praydatatime[index][0]} * * *`);
-    // }
-    // return;
-
-
-
     //get latest prayer data if not yet done
     if (!fs.existsSync(filename)) {
         await getprayertimes()
