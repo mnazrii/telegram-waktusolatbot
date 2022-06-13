@@ -11,7 +11,7 @@ buat file secret.js yg mengandungi token secret dan chatid/group id sebelum bole
                 "chat_id":"-725570XXX"
         }`
 
-untuk dapatkan token id. pergi ke @botfarther dalam telegram. dan tekan /newbot.
+untuk dapatkan token id. pergi ke @botfather dalam telegram. dan tekan /newbot.
 add bot yg dah dibuat dalam group untuk membolehkan mesej dihantar. 
 
         Run:
